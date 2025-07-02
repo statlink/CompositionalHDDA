@@ -1,0 +1,8 @@
+#useDynLib(CompositionalHDDA, .registration=TRUE)
+
+importFrom("HDclassif", hdda)
+importFrom("Compositional", makefolds, alfa)
+importFrom("Rfast", colmeans)
+importFrom("stats", predict)
+
+export("alfa.hdda", "cv.alfahdda")

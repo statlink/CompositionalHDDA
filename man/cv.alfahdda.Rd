@@ -1,0 +1,98 @@
+\name{cv.alfahdda}
+\alias{cv.alfahdda}
+\title{
+Cross-Validation of the HDDA for compositional data using the alpha-transformation
+}
+
+\description{
+Cross-Validation of the HDDA for compositional data using the alpha-transformation.
+}
+
+\usage{
+cv.alfahdda(ina, x, a = seq(-1, 1, by = 0.1), d_select = "both", 
+threshold = c(0.001, 0.005, 0.05, 1:9 * 0.1), folds = NULL, stratified = TRUE, 
+nfolds = 10, seed = NULL)
+}
+
+\arguments{
+\item{ina}{
+A group indicator variable for the compositional data.
+}
+\item{x}{
+The compositional data. Zero values are allowed.
+}
+\item{a}{
+A vector of \eqn{\alpha} values.
+}
+\item{d_select}{
+Either "Cattell", "BIC" or "both".
+}
+\item{threshold}{
+A vector with numbers strictly bewtween 0 and 1. Each value corresponds to a threshold used in the Cattell's Scree-Test.
+}
+\item{folds}{
+If you have the list with the folds supply it here. You can also leave it
+NULL and it will create folds.
+}
+\item{stratified}{
+Do you want the folds to be created in a stratified way? The default value is TRUE.
+}
+\item{nfolds}{
+The number of folds in the cross validation.
+}
+\item{seed}{
+You can specify your own seed number here or leave it NULL.
+}
+}
+
+\details{
+K-fold cross-validation for the high dimensional discriminant analysis with compositional data using the \eqn{\alpha}-transformation is performed.
+}
+
+\value{
+A list including:
+\item{kl}{
+A matrix with the configurations of hyper-parameters tested and the estimated
+Kullback-Leibler divergence, for each configuration.
+}
+\item{js}{
+A matrix with the configurations of hyper-parameters tested and the estimated
+Jensen-Shannon divergence, for each configuration.
+}
+}
+
+\references{
+Bouveyron C. Girard S. and Schmid C. (2007). High Dimensional Discriminant Analysis. Communications in Statistics: Theory and Methods, 36(14): 2607--2623.
+
+Bouveyron C. Celeux G. and Girard S. (2010). Intrinsic dimension estimation by maximum likelihood in probabilistic PCA. Technical Report 440372, Universite Paris 1 Pantheon-Sorbonne.
+
+Berge L. Bouveyron C. and Girard S. (2012). HDclassif: An R Package for Model-Based Clustering and Discriminant Analysis of High-Dimensional Data. Journal of Statistical Software, 46(6).
+
+Tsagris M.T., Preston S. and Wood A.T.A. (2011). A data-based power transformation
+for compositional data. In Proceedings of the 4th Compositional Data Analysis Workshop,
+Girona, Spain. https://arxiv.org/pdf/1106.1451.pdf
+}
+
+\author{
+Michail Tsagris.
+
+R implementation and documentation: Michail Tsagris \email{mtsagris@uoc.gr}.
+}
+
+%\note{
+%%  ~~further notes~~
+%}
+
+\seealso{
+\code{\link{alfa.hdda}
+}
+}
+
+\examples{
+x <- matrix( rgamma(100 * 200, runif(200, 4, 10), 1), ncol = 200, byrow = TRUE )
+x <- x / rowSums(x)  ## Dirichlet simulated values
+ina <- rbinom(100, 1, 0.5)
+mod <- cv.alfahdda(ina, x, a = c(0.1, 0.5, 1), d_select = "both", 
+threshold = seq(0.1, 0.5, by = 0.1), nfolds = 5)
+}
+

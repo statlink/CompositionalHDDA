@@ -1,0 +1,89 @@
+\name{alfa.hdda}
+\alias{alfa.hdda}
+\title{
+HDDA for compositional data using the alpha-transformation
+}
+
+\description{
+HDDA for compositional data using the alpha-transformation.
+}
+
+\usage{
+alfa.hdda(xnew, ina, x, a = seq(-1, 1, by = 0.1), d_select = "Catell", threshold = 0.2)
+}
+
+\arguments{
+\item{xnew}{
+A matrix with the new compositional data whose class is to be predicted.
+}
+\item{x}{
+The compositional data. Zero values are allowed.
+}
+\item{a}{
+Either a single value or a vector of \eqn{\alpha} values.
+}
+\item{d_select}{
+Either "Cattell", "BIC" or "both".
+“Cattell”: The Cattell's scree-test is used to gather the intrinsic dimension of each class. If the model is of common dimension (models 7 to 14), the scree-test is done on the covariance matrix of the whole dataset.
+
+“BIC”: The intrinsic dimensions are selected with the BIC criterion. See Bouveyron et al. (2010) for a discussion of this topic. For common dimension models, the procedure is done on the covariance matrix of the whole dataset.
+}
+\item{threshold}{
+A float stricly within 0 and 1. It is the threshold used in the Cattell's Scree-Test.
+}
+}
+
+\details{
+The compositional data are first using the \eqn{\alpha}-transformation and then the HDDA algorithm is called.
+The function then will compute all the models, give their BIC and keep the model with the highest BIC value. 
+}
+
+\value{
+A list with sub-lists, one for each value of \eqn{\alpha}, where each sub-list includes:
+\item{mod}{
+A list containing the output as returned by the function \bold{hdda} from the package \bold{HDclassif}. 
+}
+\item{class}{
+The predicted class of each observation.
+}
+\item{posterior}{
+The posterior probabilities of each new observation.
+}
+}
+
+\references{
+Bouveyron C. Girard S. and Schmid C. (2007). High Dimensional Discriminant Analysis. Communications in Statistics: Theory and Methods, 36(14): 2607-–2623.
+
+Bouveyron C. Celeux G. and Girard S. (2010). Intrinsic dimension estimation by maximum likelihood in probabilistic PCA. Technical Report 440372, Universite Paris 1 Pantheon-Sorbonne.
+
+Berge L. Bouveyron C. and Girard S. (2012). HDclassif: An R Package for Model-Based Clustering and Discriminant Analysis of High-Dimensional Data. Journal of Statistical Software, 46(6).
+
+Tsagris M.T., Preston S. and Wood A.T.A. (2011). A data-based power transformation
+for compositional data. In Proceedings of the 4th Compositional Data Analysis Workshop,
+Girona, Spain. https://arxiv.org/pdf/1106.1451.pdf
+}
+
+\author{
+Michail Tsagris.
+
+R implementation and documentation: Michail Tsagris \email{mtsagris@uoc.gr}.
+}
+
+%\note{
+%%  ~~further notes~~
+%}
+
+\seealso{
+\code{\link{cv.alfahdda}
+}
+}
+
+\examples{
+x <- matrix( rgamma(60 * 100, runif(100, 4, 10), 1), ncol = 100, byrow = TRUE )
+x <- x / rowSums(x)  ## Dirichlet simulated values
+xnew <- matrix( rgamma(20 * 100, runif(100, 4, 10), 1), ncol = 100, byrow = TRUE )
+xnew <- xnew / rowSums(xnew)  ## Dirichlet simulated values
+ina <- rbinom(60, 1, 0.5)
+alfa.hdda(xnew, ina, x, a = 0.5)
+}
+

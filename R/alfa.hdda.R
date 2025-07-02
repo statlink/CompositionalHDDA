@@ -1,0 +1,42 @@
+alfa.hdda <- function(xnew, ina, x, a = seq(-1, 1, by = 0.1), d_select = "Cattell", threshold = 0.2) {
+  
+  if ( min(x) == 0 )  a <- a[a > 0]
+  la <- length(a)
+  ina <- as.factor(ina)
+  
+  if (d_select != "both" ) {
+    names <- paste("alpha", a)
+    res <- sapply(names, function(x) NULL)
+    for ( i in 1:length(a) ) {
+      y <- Compositional::alfa(x, a[i])$aff  ## apply the alpha-transformation
+      ynew <- Compositional::alfa(xnew, a[i])$aff
+      mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = d_select, 
+                              threshold = threshold )
+      est <- predict(mod, ynew)
+      res[[ i ]] <- list(mod = mod, class = est$class, posterior = est$posterior)   
+    }
+  
+  } else {
+    res <- list()
+    names <- paste("alpha", a)
+    bic <- cattell <- sapply(names, function(x) NULL)
+    for ( i in 1:length(a) ) {
+      y <- Compositional::alfa(x, a[i])$aff  ## apply the alpha-transformation
+      ynew <- Compositional::alfa(xnew, a[i])$aff
+      mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "Cattell", 
+                              threshold = threshold )
+      est <- predict(mod, ynew)
+      cattell[[ i ]] <- list(mod = mod, class = est$class, posterior = est$posterior)   
+      mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "BIC", 
+                              threshold = threshold )
+      est <- predict(mod, ynew)
+      bic[[ i ]] <- list(mod = mod, class = est$class, posterior = est$posterior)   
+    }
+    res$cattell <- cattell
+    res$bic <- bic
+  }     
+
+  res
+}
+    
+

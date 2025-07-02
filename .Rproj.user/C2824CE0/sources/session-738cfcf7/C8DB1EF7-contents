@@ -1,0 +1,64 @@
+cv.alfahdda <- function(ina, x, a = seq(-1, 1, by = 0.1), d_select = "both", 
+               threshold = c(0.001, 0.005, 0.05, 1:9 * 0.1), folds = NULL, nfolds = 10, seed = NULL) {
+
+  if ( min(y) == 0 )  a <- a[a > 0]
+  la <- length(a)
+
+  if ( is.null(folds) )
+  folds <- Compositional::makefolds(1:n, nfolds = nfolds, stratified = FALSE, seed = seed)
+  nfolds <- length(folds)
+  config <- NULL
+  
+  if  ( d_select = "Cattell"  ) {
+    config <- as.matrix( expand.grid(a = a, threshold = threshold) )
+    p <- dim(config)[1]
+    cv <- matrix(nrow = nfolds, ncol = p) 
+  } else if ( d_select == "BIC" )  {
+    cv <- matrix(nrow = nfolds, ncol = la)
+  } else if ( d_select = "both" ) {
+    config <- as.matrix( expand.grid(a = a, threshold = threshold) )
+    p <- dim(config)[1]
+    cv <- matrix(nrow = nfolds, ncol = p + 1) 
+  }
+  
+  for ( k in 1:nfolds ) {
+    inatrain <- ina[ -folds[[ k ]], ]
+    inatest <- ina[ folds[[ k ]],  ]
+    xtrain <- x[-folds[[ k ]], ]
+    xtest <- x[folds[[ k ]], ]
+    
+    for ( i in 1:la ) {
+      y <- Compositional::alfa(x, a[i])$aff  ## apply the alpha-transformation
+      ynew <- Compositional::alfa(xnew, a[i])$aff
+      if ( d_select = "Cattell" ) {
+        for ( j in 1:length(threshold) ) {
+          mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "Cattell", 
+                                  threshold = threshold[j] )
+          est <- predict(mod, ynew)$class
+          cv[k, (i - 1) * la + j] <- mean(est == inatest)
+        } 
+      } else if ( d_select = "BIC" ) {
+        mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "Cattell", 
+                                threshold = threshold[j] )
+        est <- predict(mod, ynew)$class
+        cv[k, i] <- mean(est == inatest)
+      } else if ( d_select = "both" ) {
+        for ( j in 1:length(threshold) ) {
+          mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "Cattell", 
+                                  threshold = threshold[j] )
+          est <- predict(mod, ynew)$class
+          cv[k, (i - 1) * la + j] <- mean(est == inatest)
+        } 
+        mod <- HDclassif::hdda( data = y, cls = ina, model = "all", d_select = "Cattell", 
+                                threshold = threshold[j] )
+        est <- predict(mod, ynew)$class
+        cv[k, p + 1] <- mean(est == inatest)
+      }
+      
+    }  ##  end for ( i in 1:length(a) ) {
+  }  ##  end  for ( k in 1:nfolds ) {
+
+}  
+
+  
+  
